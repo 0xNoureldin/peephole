@@ -37,17 +37,37 @@ async function readAll() {
   return { total: parseInt(t ?? 0, 10) || 0, safe: parseInt(s ?? 0, 10) || 0, dangerous: parseInt(d ?? 0, 10) || 0 };
 }
 
+const ALLOWED = new Set(['safe', 'dangerous', 'unknown']);
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
+  const method = req.method || 'GET';
+
+  // Only GET (read) and POST (increment) are supported.
+  if (method !== 'GET' && method !== 'POST') {
+    res.setHeader('Allow', 'GET, POST');
+    return res.status(405).json({ error: 'method not allowed', allow: ['GET', 'POST'] });
+  }
+
+  let v = null;
+  try { v = (new URL(req.url, 'http://local').searchParams.get('v') || '').toLowerCase(); } catch {}
+
+  // An increment must say which bucket it belongs to. Reject a POST with no (or
+  // an unrecognized) v, whether or not the store is configured.
+  if (method === 'POST' && !ALLOWED.has(v)) {
+    return res.status(400).json({
+      error: "POST requires a 'v' parameter",
+      expected: [...ALLOWED],
+      example: '/api/count?v=dangerous',
+    });
+  }
 
   if (!BASE || !TOKEN) {
     return res.status(200).json({ total: null, safe: null, dangerous: null, configured: false });
   }
 
   try {
-    if (req.method === 'POST') {
-      let v = '';
-      try { v = (new URL(req.url, 'http://local').searchParams.get('v') || '').toLowerCase(); } catch {}
+    if (method === 'POST') {
       const commands = [['INCR', KEYS.total]];
       if (v === 'safe') commands.push(['INCR', KEYS.safe]);
       else if (v === 'dangerous') commands.push(['INCR', KEYS.dangerous]);
