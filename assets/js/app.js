@@ -29,7 +29,7 @@ function incLocal() { const n = readLocal() + 1; try { localStorage.setItem(COUN
 
 function showCount(n, isGlobal) {
   $('#count').textContent = Number(n).toLocaleString();
-  $('#count-label').textContent = isGlobal ? 'Files checked by everyone' : 'Files checked on this device';
+  $('#count-label').textContent = isGlobal ? 'files checked' : 'checked here';
   $('#count-row').hidden = false;
 }
 
