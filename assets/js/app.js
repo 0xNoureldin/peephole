@@ -318,7 +318,6 @@ function boot() {
   initDropzone();
   initSamples();
   loadCount();
-  $('#year').textContent = new Date().getFullYear();
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

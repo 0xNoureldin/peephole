@@ -26,7 +26,7 @@
     --font-d: "Space Grotesk", system-ui, sans-serif;
     --font-b: "Inter", system-ui, -apple-system, sans-serif;
     --font-m: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
-    --maxw: 1240px;
+    --maxw: 1400px;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
@@ -98,18 +98,39 @@
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .icon-btn .moon { display: block; } :root:not([data-theme="light"]) .icon-btn .sun { display: none; } }
   :root[data-theme="dark"] .icon-btn .moon { display: block; } :root[data-theme="dark"] .icon-btn .sun { display: none; }
 
-  /* Hero */
-  .hero { padding-block: 40px 20px; text-align: center; }
-  .hero h1 { font-family: var(--font-d); font-weight: 700; font-size: clamp(32px, 6vw, 52px); line-height: 1.05; letter-spacing: -.03em; margin: 0 auto; max-width: 16ch; text-wrap: balance; }
-  .hero h1 .mark { color: var(--accent); }
-  .hero p { margin: 16px auto 0; max-width: 56ch; color: var(--fg-soft); font-size: clamp(15px, 2.4vw, 18px); text-wrap: pretty; }
+  /* Stage: upload on the left, how-it-works flow on the right */
+  .stage { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(20px, 3.5vw, 46px); align-items: stretch; padding-block: 34px 10px; }
+  .stage-left { display: flex; flex-direction: column; }
+  .intro h1 { font-family: var(--font-d); font-weight: 700; font-size: clamp(30px, 4.4vw, 46px); line-height: 1.05; letter-spacing: -.03em; margin: 0; max-width: 15ch; text-wrap: balance; }
+  .intro h1 .mark { color: var(--accent); }
+  .intro p { margin: 12px 0 0; max-width: 44ch; color: var(--fg-soft); font-size: clamp(15px, 2vw, 17px); }
+  @media (max-width: 880px) { .stage { grid-template-columns: 1fr; } }
+
+  /* Flow chart */
+  .panel { height: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: calc(var(--radius) + 4px); padding: clamp(20px, 2.6vw, 28px); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+  .flow-head { font-family: var(--font-d); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .09em; color: var(--fg-faint); margin: 0 0 16px; }
+  .flow { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; flex: 1; justify-content: center; }
+  .node { display: flex; align-items: center; gap: 14px; padding: 14px 15px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); }
+  .node-ic { width: 40px; height: 40px; border-radius: 11px; background: var(--accent-soft); color: var(--accent-ink); display: grid; place-items: center; flex: none; }
+  .node-ic svg { width: 21px; height: 21px; }
+  .node-body { min-width: 0; }
+  .node-t { font-family: var(--font-d); font-weight: 600; font-size: 15.5px; letter-spacing: -.01em; }
+  .node-s { font-size: 12.5px; color: var(--fg-faint); margin-top: 1px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 7px; background: var(--surface); border: 1px solid var(--line); color: var(--fg-soft); }
+  .verdicts { display: flex; gap: 7px; margin-top: 9px; }
+  .v { flex: 1; text-align: center; font-weight: 700; font-size: 12.5px; padding: 6px 4px; border-radius: 8px; font-family: var(--font-d); }
+  .v-safe { background: var(--safe-bg); color: var(--safe); }
+  .v-bad { background: var(--danger-bg); color: var(--danger); }
+  .arrow { display: flex; justify-content: center; padding: 5px 0; color: var(--line-strong); }
+  .arrow svg { width: 18px; height: 18px; }
 
   /* Drop zone */
   .drop {
-    margin-top: 30px; border: 1.5px dashed var(--line-strong); border-radius: calc(var(--radius) + 6px);
+    margin-top: 22px; flex: 1; min-height: 240px; border: 1.5px dashed var(--line-strong); border-radius: calc(var(--radius) + 6px);
     background: var(--surface); box-shadow: var(--shadow);
-    padding: clamp(28px, 6vw, 56px) 24px; text-align: center; cursor: pointer; transition: .18s ease;
-    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    padding: clamp(28px, 4vw, 48px) 24px; text-align: center; cursor: pointer; transition: .18s ease;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
   }
   .drop:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-lift); }
   .drop:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 3px; }
@@ -122,11 +143,14 @@
   .drop .ext { font-family: var(--font-m); font-size: 11.5px; padding: 3px 8px; border-radius: 6px; background: var(--surface-2); color: var(--fg-soft); border: 1px solid var(--line); }
   .cta { margin-top: 4px; font-weight: 600; color: var(--accent-ink); font-size: 14.5px; }
 
+  /* Scan output */
+  .scan-area:empty { display: none; }
+
   /* Samples */
-  .samples-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 34px 0 14px; }
+  .samples-head { display: flex; align-items: baseline; gap: 12px; margin: 40px 0 14px; }
   .samples-head h3 { font-family: var(--font-d); font-weight: 600; font-size: 16px; margin: 0; letter-spacing: -.01em; }
   .samples-head span { color: var(--fg-faint); font-size: 13px; }
-  .samples { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+  .samples { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
   .sample { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 15px 16px; cursor: pointer; display: flex; flex-direction: column; gap: 5px; transition: .15s; position: relative; overflow: hidden; }
   .sample::before { content:""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--line-strong); transition: .15s; }
   .sample-danger::before { background: var(--danger); }
@@ -206,13 +230,6 @@
   .btn-ghost { margin-top: 22px; width: 100%; padding: 13px; border-radius: 11px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--fg); font-family: var(--font-d); font-weight: 600; font-size: 15px; cursor: pointer; transition: .15s; }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent-ink); }
 
-  /* How it works */
-  .how { margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
-  .how-card { padding: 20px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); }
-  .how-card .n { font-family: var(--font-m); font-size: 12px; color: var(--accent-ink); font-weight: 500; }
-  .how-card h4 { font-family: var(--font-d); font-weight: 600; font-size: 16px; margin: 8px 0 7px; letter-spacing: -.01em; }
-  .how-card p { margin: 0; color: var(--fg-soft); font-size: 13.5px; line-height: 1.5; }
-
   /* Footer */
   footer { margin-top: 56px; padding-block: 28px 40px; border-top: 1px solid var(--line); }
   .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; }
@@ -259,40 +276,63 @@
   </header>
 
   <main>
-    <section class="hero">
-      <h1>See what a file does <span class="mark">before</span> you open it</h1>
-      <p>Drop in a Word, Excel, PowerPoint, PDF or RTF file. Peephole opens it up safely and tells you whether it hides macros, scripts, or code that quietly reaches out to the internet — and shows you the exact lines.</p>
+    <section class="stage">
+      <div class="stage-left">
+        <div class="intro">
+          <h1>See inside a file <span class="mark">before</span> you open it</h1>
+          <p>Macros, hidden scripts, silent web requests — caught in your browser. Nothing is uploaded.</p>
+        </div>
+        <div id="drop" class="drop" tabindex="0" role="button" aria-label="Choose a file or drop one here to check it">
+          <div class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div>
+          <h2>Drop a file to check it</h2>
+          <div class="sub">or click to browse</div>
+          <div class="exts">
+            <span class="ext">.docx</span><span class="ext">.xlsm</span><span class="ext">.pptx</span><span class="ext">.doc</span><span class="ext">.rtf</span><span class="ext">.pdf</span>
+          </div>
+        </div>
+        <input id="file" type="file" hidden accept=".docx,.docm,.dotx,.dotm,.xlsx,.xlsm,.xltx,.xltm,.xlam,.pptx,.pptm,.potx,.potm,.ppsx,.ppsm,.ppam,.doc,.dot,.xls,.xlt,.xla,.ppt,.pot,.pps,.rtf,.pdf,.xml,.mht,.mhtml,.odt,.ods,.odp">
+      </div>
+
+      <aside class="stage-right">
+        <div class="panel">
+          <p class="flow-head">How it works</p>
+          <ol class="flow">
+            <li class="node">
+              <div class="node-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M12 4l-3.5 3.5M12 4l3.5 3.5"/><path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg></div>
+              <div class="node-body"><div class="node-t">Drop a file</div><div class="node-s">Word · Excel · PDF · more</div></div>
+            </li>
+            <li class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></li>
+            <li class="node">
+              <div class="node-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+              <div class="node-body"><div class="node-t">Opens in your browser</div><div class="node-s">Never uploaded</div></div>
+            </li>
+            <li class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></li>
+            <li class="node">
+              <div class="node-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="12" rx="10" ry="6.5"/><circle cx="12" cy="12" r="3.3" fill="currentColor" stroke="none"/></svg></div>
+              <div class="node-body"><div class="node-t">Looks inside</div><div class="chips"><span class="chip">Macros</span><span class="chip">Scripts</span><span class="chip">Web requests</span></div></div>
+            </li>
+            <li class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></li>
+            <li class="node">
+              <div class="node-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+              <div class="node-body"><div class="node-t">You get a verdict</div><div class="verdicts"><span class="v v-safe">Safe</span><span class="v v-bad">Dangerous + proof</span></div></div>
+            </li>
+          </ol>
+        </div>
+      </aside>
     </section>
 
-    <div id="drop" class="drop" tabindex="0" role="button" aria-label="Choose a file or drop one here to check it">
-      <div class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div>
-      <h2>Drop a file here to check it</h2>
-      <div class="sub">or click to browse — nothing leaves your device</div>
-      <div class="exts">
-        <span class="ext">.docx</span><span class="ext">.xlsm</span><span class="ext">.pptx</span><span class="ext">.doc</span><span class="ext">.xls</span><span class="ext">.rtf</span><span class="ext">.pdf</span><span class="ext">.xml</span>
+    <section class="scan-area">
+      <div id="working" class="working" hidden>
+        <div class="scanner"></div>
+        <div class="w-txt"><b>Checking <span id="working-name"></span></b><div>Reading the file in your browser…</div></div>
       </div>
-      <div class="cta">Choose file →</div>
-    </div>
-    <input id="file" type="file" hidden accept=".docx,.docm,.dotx,.dotm,.xlsx,.xlsm,.xltx,.xltm,.xlam,.pptx,.pptm,.potx,.potm,.ppsx,.ppsm,.ppam,.doc,.dot,.xls,.xlt,.xla,.ppt,.pot,.pps,.rtf,.pdf,.xml,.mht,.mhtml,.odt,.ods,.odp">
-
-    <div id="working" class="working" hidden>
-      <div class="scanner"></div>
-      <div class="w-txt"><b>Checking <span id="working-name"></span></b><div>Reading the file in your browser…</div></div>
-    </div>
-
-    <div id="result" class="result" hidden></div>
+      <div id="result" class="result" hidden></div>
+    </section>
 
     <div class="samples-head">
       <h3>Try an example</h3>
-      <span>Safe, synthetic files built in your browser</span>
     </div>
     <div id="samples" class="samples"></div>
-
-    <div class="how">
-      <div class="how-card"><div class="n">01</div><h4>Nothing is uploaded</h4><p>The file is read and taken apart entirely on your device using your browser. No server ever sees it, so there is no copy to leak.</p></div>
-      <div class="how-card"><div class="n">02</div><h4>It looks inside</h4><p>Peephole unpacks the document, decompresses its VBA macro storage, walks PDF objects and reads relationship files — the places real threats hide.</p></div>
-      <div class="how-card"><div class="n">03</div><h4>It shows the evidence</h4><p>When something is dangerous you see the actual macro source, the DDE command, or the URL the file would request — not just a score.</p></div>
-    </div>
   </main>
 
   <footer>

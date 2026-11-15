@@ -28,10 +28,10 @@ function ddeXml() {
 }
 
 export const SAMPLES = [
-  { id: 'beacon', name: 'invoice-tracker.docx', label: 'Word that phones home', note: 'Loads a remote image on open \u2014 the exact tracking-beacon pattern', danger: true, make: beaconDocx },
-  { id: 'pdf', name: 'statement-autorun.pdf', label: 'PDF that auto-runs', note: 'JavaScript on open that submits to a remote server', danger: true, make: autoPdf },
-  { id: 'dde', name: 'notice.xml', label: 'Document that runs a command', note: 'A DDE field that launches PowerShell', danger: true, make: ddeXml },
-  { id: 'clean', name: 'lunch-note.docx', label: 'An ordinary document', note: 'No macros, no remote resources \u2014 should come back clean', danger: false, make: cleanDocx },
+  { id: 'beacon', name: 'invoice-tracker.docx', label: 'Phones home', note: 'Loads a remote image on open', danger: true, make: beaconDocx },
+  { id: 'pdf', name: 'statement-autorun.pdf', label: 'Auto-runs code', note: 'Runs JavaScript on open', danger: true, make: autoPdf },
+  { id: 'dde', name: 'notice.xml', label: 'Runs a command', note: 'Launches PowerShell via DDE', danger: true, make: ddeXml },
+  { id: 'clean', name: 'lunch-note.docx', label: 'Ordinary file', note: 'No macros, no web requests', danger: false, make: cleanDocx },
 ];
 
 export async function makeSample(id) {
