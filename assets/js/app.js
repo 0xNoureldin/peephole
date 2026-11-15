@@ -71,7 +71,7 @@ function initTheme() {
 // ---------- scanning ----------
 let busy = false;
 
-async function scan(name, bytes) {
+async function scan(name, bytes, opts = {}) {
   if (busy) return;
   busy = true;
   showStage('working', name);
@@ -80,7 +80,8 @@ async function scan(name, bytes) {
     await new Promise((r) => setTimeout(r, 30));
     const [report, hash] = await Promise.all([analyzeFile(name, bytes), sha256Hex(bytes).catch(() => null)]);
     renderReport(report, hash);
-    await bumpCount();
+    // Demo files (opts.count === false) don't count toward the files-checked total.
+    if (opts.count !== false) await bumpCount();
   } catch (err) {
     renderError(err?.message || 'Something went wrong while reading the file.');
   } finally {
@@ -292,7 +293,7 @@ function initSamples() {
     b.append(el('span', 'sample-note', s.note));
     b.addEventListener('click', async () => {
       const made = await makeSample(s.id);
-      if (made) scan(made.name, made.bytes);
+      if (made) scan(made.name, made.bytes, { count: false });
     });
     row.append(b);
   }
