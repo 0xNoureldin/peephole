@@ -50,9 +50,32 @@ present) and asserts the verdicts.
 
 ## Deploy
 
-Static site — no build step. On **Vercel**, import the repo and deploy; the
-included `vercel.json` sets `cleanUrls` and strict security headers
-(a locked-down Content-Security-Policy, `nosniff`, `no-referrer`, `DENY` framing).
+Static site + one serverless function — no build step. On **Vercel**, import the
+repo and deploy; the included `vercel.json` sets `cleanUrls` and strict security
+headers (a locked-down Content-Security-Policy, `nosniff`, `no-referrer`,
+`DENY` framing).
+
+### Global "files checked" counter
+
+The footer shows a running total of files checked by everyone. It's served by
+`api/count.js`, which keeps a single integer in a Redis/KV store. **File contents
+never reach this endpoint** — the browser does all the checking locally and only
+calls the function to read the total or add an anonymous `+1`.
+
+To turn the global counter on (one-time, ~3 clicks):
+
+1. In the Vercel dashboard, open your project → **Storage** → create a free
+   **KV / Upstash Redis** store and connect it to this project.
+2. Vercel injects the credentials as environment variables automatically. The
+   function reads either naming scheme:
+   - `KV_REST_API_URL` + `KV_REST_API_TOKEN` (Vercel KV), or
+   - `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` (Upstash integration).
+3. Redeploy.
+
+Until a store is linked, `api/count` reports `{ configured: false }` and the page
+automatically falls back to a **per-device** count in the visitor's browser, so
+the site works before and after you set this up. Running locally with a plain
+static server (no functions) uses the same per-device fallback.
 
 ## How it's built
 

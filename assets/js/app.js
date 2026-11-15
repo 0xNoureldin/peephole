@@ -16,14 +16,43 @@ const KIND_META = {
   note:     { icon: 'i', label: 'Note' },
 };
 
-// ---------- privacy-preserving on-device counter ----------
+// ---------- files-checked counter ----------
+// Prefers the global total from /api/count; if that endpoint isn't configured
+// yet (or we're running from a plain static server), it falls back to a private
+// per-device tally in localStorage. The file itself is never sent either way.
 const COUNT_KEY = 'peephole.checks';
-function readCount() { try { return parseInt(localStorage.getItem(COUNT_KEY) || '0', 10) || 0; } catch { return 0; } }
-function bumpCount() { let n = readCount() + 1; try { localStorage.setItem(COUNT_KEY, String(n)); } catch {} return n; }
-function renderCount() {
-  const n = readCount();
-  $('#count').textContent = n.toLocaleString();
-  $('#count-row').hidden = n === 0;
+const COUNT_API = '/api/count';
+let globalCount = false;
+
+function readLocal() { try { return parseInt(localStorage.getItem(COUNT_KEY) || '0', 10) || 0; } catch { return 0; } }
+function incLocal() { const n = readLocal() + 1; try { localStorage.setItem(COUNT_KEY, String(n)); } catch {} return n; }
+
+function showCount(n, isGlobal) {
+  $('#count').textContent = Number(n).toLocaleString();
+  $('#count-label').textContent = isGlobal ? 'Files checked by everyone' : 'Files checked on this device';
+  $('#count-row').hidden = false;
+}
+
+async function loadCount() {
+  try {
+    const r = await fetch(COUNT_API, { method: 'GET' });
+    if (r.ok) {
+      const d = await r.json();
+      if (d && d.configured && typeof d.total === 'number') { globalCount = true; showCount(d.total, true); return; }
+    }
+  } catch {}
+  globalCount = false;
+  if (readLocal() > 0) showCount(readLocal(), false);
+}
+
+async function bumpCount() {
+  if (globalCount) {
+    try {
+      const r = await fetch(COUNT_API, { method: 'POST' });
+      if (r.ok) { const d = await r.json(); if (d && typeof d.total === 'number') { showCount(d.total, true); return; } }
+    } catch {}
+  }
+  showCount(incLocal(), false);
 }
 
 // ---------- theme ----------
@@ -51,8 +80,7 @@ async function scan(name, bytes) {
     await new Promise((r) => setTimeout(r, 30));
     const [report, hash] = await Promise.all([analyzeFile(name, bytes), sha256Hex(bytes).catch(() => null)]);
     renderReport(report, hash);
-    renderCount.lastBump = bumpCount();
-    renderCount();
+    await bumpCount();
   } catch (err) {
     renderError(err?.message || 'Something went wrong while reading the file.');
   } finally {
@@ -289,7 +317,7 @@ function boot() {
   initTheme();
   initDropzone();
   initSamples();
-  renderCount();
+  loadCount();
   $('#year').textContent = new Date().getFullYear();
 }
 
