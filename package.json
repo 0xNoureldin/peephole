@@ -1,0 +1,16 @@
+{
+  "name": "peephole",
+  "version": "1.0.0",
+  "description": "Check Office and PDF files for macros, scripts and remote requests, entirely in the browser.",
+  "scripts": {
+    "test": "node tests/run.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "jszip": "^3.10.1"
+  },
+  "private": true
+}
