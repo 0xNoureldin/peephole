@@ -90,8 +90,11 @@ async function scan(name, bytes, opts = {}) {
     await new Promise((r) => setTimeout(r, 30));
     const [report, hash] = await Promise.all([analyzeFile(name, bytes), sha256Hex(bytes).catch(() => null)]);
     renderReport(report, hash);
-    // Demo files (opts.count === false) don't count toward the totals.
-    if (opts.count !== false) await bumpCount(report.verdict);
+    // Count only classified files: demo files (opts.count === false) and
+    // files we couldn't classify ('unknown') don't count toward any total.
+    if (opts.count !== false && (report.verdict === 'safe' || report.verdict === 'dangerous')) {
+      await bumpCount(report.verdict);
+    }
   } catch (err) {
     renderError(err?.message || 'Something went wrong while reading the file.');
   } finally {

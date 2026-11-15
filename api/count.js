@@ -37,7 +37,9 @@ async function readAll() {
   return { total: parseInt(t ?? 0, 10) || 0, safe: parseInt(s ?? 0, 10) || 0, dangerous: parseInt(d ?? 0, 10) || 0 };
 }
 
-const ALLOWED = new Set(['safe', 'dangerous', 'unknown']);
+// Only classified verdicts count. 'unknown' (unsupported/damaged files) is
+// intentionally rejected so total always equals safe + dangerous.
+const ALLOWED = new Set(['safe', 'dangerous']);
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
