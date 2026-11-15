@@ -69,10 +69,14 @@
   .contact { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; padding-left: 14px; border-left: 1px solid var(--rule); }
   .contact:hover { color: var(--accent-ink); }
   .contact svg { width: 15px; height: 15px; }
-  /* Counter — at the top */
-  .stat { display: inline-flex; align-items: baseline; gap: 7px; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 999px; background: var(--surface); }
-  .stat-n { font-family: var(--font-m); font-weight: 500; font-size: 14px; color: var(--accent-ink); font-variant-numeric: tabular-nums; }
-  .stat-l { font-size: 11.5px; letter-spacing: .04em; color: var(--ink-faint); text-transform: uppercase; }
+  /* Counters — at the top: total · safe · dangerous */
+  .stats { display: inline-flex; align-items: stretch; border: 1px solid var(--rule); border-radius: 999px; background: var(--surface); overflow: hidden; }
+  .stat { display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 13px; }
+  .stat + .stat { border-left: 1px solid var(--rule); }
+  .stat b { font-family: var(--font-m); font-weight: 500; font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .stat .lbl { font-size: 11px; letter-spacing: .05em; color: var(--ink-faint); text-transform: uppercase; }
+  .stat.safe b { color: var(--safe); }
+  .stat.bad b { color: var(--danger); }
   .tbtn { width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink-soft); cursor: pointer; display: grid; place-items: center; }
   .tbtn:hover { color: var(--ink); border-color: var(--rule-strong); }
   .tbtn svg { width: 17px; height: 17px; }
@@ -218,9 +222,10 @@
   .disclaimer { margin-top: 16px; font-family: var(--font-m); font-size: 11.5px; color: var(--ink-faint); line-height: 1.6; max-width: 92ch; }
 
   [hidden] { display: none !important; }
-  @media (max-width: 580px) {
+  @media (max-width: 680px) {
     .util { flex-wrap: wrap; }
-    .stat-l { display: none; }
+    .stat .lbl { display: none; }
+    .stat { padding: 6px 11px; }
     .contact span { display: none; }
   }
 </style>
@@ -236,7 +241,11 @@
       </a>
     </div>
     <div class="util-right">
-      <div id="count-row" class="stat" hidden><span class="stat-n" id="count">0</span><span class="stat-l" id="count-label">files checked</span></div>
+      <div id="count-row" class="stats" hidden>
+        <span class="stat"><b id="stat-total">0</b><span class="lbl">checked</span></span>
+        <span class="stat safe"><b id="stat-safe">0</b><span class="lbl">safe</span></span>
+        <span class="stat bad"><b id="stat-dangerous">0</b><span class="lbl">dangerous</span></span>
+      </div>
       <button id="theme" class="tbtn" aria-label="Toggle light or dark theme" title="Toggle theme">
         <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>
         <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8 8 0 0 1 9.5 4a.5.5 0 0 0-.7-.6A9 9 0 1 0 20.6 15.2a.5.5 0 0 0-.6-.7z"/></svg>

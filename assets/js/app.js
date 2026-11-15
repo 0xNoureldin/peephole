@@ -16,20 +16,29 @@ const KIND_META = {
   note:     { icon: 'i', label: 'Note' },
 };
 
-// ---------- files-checked counter ----------
-// Prefers the global total from /api/count; if that endpoint isn't configured
-// yet (or we're running from a plain static server), it falls back to a private
-// per-device tally in localStorage. The file itself is never sent either way.
-const COUNT_KEY = 'peephole.checks';
+// ---------- counters: total checked, safe, dangerous ----------
+// Prefers the global totals from /api/count; if that endpoint isn't configured
+// yet (or we're on a plain static server), falls back to a private per-device
+// tally in localStorage. The file itself is never sent either way.
 const COUNT_API = '/api/count';
 let globalCount = false;
+const LK = { total: 'peephole.checks', safe: 'peephole.safe', dangerous: 'peephole.dangerous' };
 
-function readLocal() { try { return parseInt(localStorage.getItem(COUNT_KEY) || '0', 10) || 0; } catch { return 0; } }
-function incLocal() { const n = readLocal() + 1; try { localStorage.setItem(COUNT_KEY, String(n)); } catch {} return n; }
+function lget(k) { try { return parseInt(localStorage.getItem(k) || '0', 10) || 0; } catch { return 0; } }
+function lset(k, v) { try { localStorage.setItem(k, String(v)); } catch {} }
+function localTotals() { return { total: lget(LK.total), safe: lget(LK.safe), dangerous: lget(LK.dangerous) }; }
+function localInc(verdict) {
+  const total = lget(LK.total) + 1; lset(LK.total, total);
+  let safe = lget(LK.safe), dangerous = lget(LK.dangerous);
+  if (verdict === 'safe') { safe += 1; lset(LK.safe, safe); }
+  else if (verdict === 'dangerous') { dangerous += 1; lset(LK.dangerous, dangerous); }
+  return { total, safe, dangerous };
+}
 
-function showCount(n, isGlobal) {
-  $('#count').textContent = Number(n).toLocaleString();
-  $('#count-label').textContent = isGlobal ? 'files checked' : 'checked here';
+function showCounts(d) {
+  $('#stat-total').textContent = Number(d.total || 0).toLocaleString();
+  $('#stat-safe').textContent = Number(d.safe || 0).toLocaleString();
+  $('#stat-dangerous').textContent = Number(d.dangerous || 0).toLocaleString();
   $('#count-row').hidden = false;
 }
 
@@ -38,21 +47,22 @@ async function loadCount() {
     const r = await fetch(COUNT_API, { method: 'GET' });
     if (r.ok) {
       const d = await r.json();
-      if (d && d.configured && typeof d.total === 'number') { globalCount = true; showCount(d.total, true); return; }
+      if (d && d.configured) { globalCount = true; showCounts(d); return; }
     }
   } catch {}
   globalCount = false;
-  if (readLocal() > 0) showCount(readLocal(), false);
+  const t = localTotals();
+  if (t.total > 0) showCounts(t);
 }
 
-async function bumpCount() {
+async function bumpCount(verdict) {
   if (globalCount) {
     try {
-      const r = await fetch(COUNT_API, { method: 'POST' });
-      if (r.ok) { const d = await r.json(); if (d && typeof d.total === 'number') { showCount(d.total, true); return; } }
+      const r = await fetch(`${COUNT_API}?v=${encodeURIComponent(verdict || '')}`, { method: 'POST' });
+      if (r.ok) { const d = await r.json(); if (d && typeof d.total === 'number') { showCounts(d); return; } }
     } catch {}
   }
-  showCount(incLocal(), false);
+  showCounts(localInc(verdict));
 }
 
 // ---------- theme ----------
@@ -80,8 +90,8 @@ async function scan(name, bytes, opts = {}) {
     await new Promise((r) => setTimeout(r, 30));
     const [report, hash] = await Promise.all([analyzeFile(name, bytes), sha256Hex(bytes).catch(() => null)]);
     renderReport(report, hash);
-    // Demo files (opts.count === false) don't count toward the files-checked total.
-    if (opts.count !== false) await bumpCount();
+    // Demo files (opts.count === false) don't count toward the totals.
+    if (opts.count !== false) await bumpCount(report.verdict);
   } catch (err) {
     renderError(err?.message || 'Something went wrong while reading the file.');
   } finally {
